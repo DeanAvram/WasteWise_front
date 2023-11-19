@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:map_app/account_screen.dart';
 
 void main() {
+  print("xx");
   runApp(const MapApp());
 }
 
