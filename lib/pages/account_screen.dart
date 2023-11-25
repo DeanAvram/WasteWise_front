@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:map_app/account_info.dart';
+import 'package:map_app/pages/account_info.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
