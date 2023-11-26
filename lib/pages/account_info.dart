@@ -11,42 +11,26 @@ class AccountInfo extends StatefulWidget {
 }
 
 class _AccountInfoState extends State<AccountInfo> {
+
+  late Future<Map<String, dynamic>> userDataFuture;
+
   @override
   void initState() {
     super.initState();
+    userDataFuture = getUserData();
   }
 
-
-  Future< Map<String, dynamic>> getUserDataTest() async {
+  Future<Map<String, dynamic>> getUserData() async {
     try{
       final response = await http.get(Uri.parse('http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=user@gmail.com&password=Aabcd1234!'), );
       if (response.statusCode == 200) {
         // If server returns an OK response, parse the JSON
-        Map<String, dynamic> jsonMap = json.decode(response.body);
-        return jsonMap;
+        return json.decode(response.body);
       } else {
         // If the server did not return a 200 OK response,
         // throw an exception.
         throw Exception('Failed to load data');
-    }
-    }
-    catch(e){
-      throw Exception('Failed to load data');
-    }
-  }
-
-  Future<String> getUserData(String key) async {
-    try{
-      final response = await http.get(Uri.parse('http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=user@gmail.com&password=Aabcd1234!'), );
-      if (response.statusCode == 200) {
-        // If server returns an OK response, parse the JSON
-        Map<String, dynamic> jsonMap = json.decode(response.body);
-        return jsonMap[key];
-      } else {
-        // If the server did not return a 200 OK response,
-        // throw an exception.
-        throw Exception('Failed to load data');
-    }
+      }
     }
     catch(e){
       throw Exception('Failed to load data');
@@ -56,8 +40,8 @@ class _AccountInfoState extends State<AccountInfo> {
   
 
   FutureBuilder buildFutureBuilder(String key){
-  return FutureBuilder(
-            future: getUserData(key),
+    return FutureBuilder(
+            future: userDataFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
@@ -65,7 +49,7 @@ class _AccountInfoState extends State<AccountInfo> {
                 return Text('Error: ${snapshot.error}');
               } else {
                 return Text(
-                  '${snapshot.data}',
+                  '${snapshot.data[key]}',
                   style: const TextStyle(
                     fontSize: 16
                   ),
