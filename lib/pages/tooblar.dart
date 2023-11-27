@@ -11,24 +11,34 @@ class Tooblar extends StatelessWidget {
     child: ListView(
       padding: EdgeInsets.zero,
       children: [
-        const SizedBox(
-          height: 65.0,
-          child: DrawerHeader(
-            padding: EdgeInsets.only(top: 15, left: 10), // Adjust the padding as needed
-            
-            decoration: BoxDecoration(
-              color: Colors.blue
-            ),
-            child: Text(
-              'Toolbar',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
+        Container(
+          color: Colors.white,
+          child: SizedBox(
+            height: 100.0,
+            child: 
+            DrawerHeader(
+              padding: const EdgeInsets.only(top: 15, left: 10), // Adjust the padding as needed
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Toolbar',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 10.0),
+                  Image.asset(
+                    'assets/logos/logo-black-nobackground.png'
+                    )
+                ],
               ),
             ),
           ),
         ),
         ListTile(
+          leading: const Icon(Icons.account_circle_outlined),
           title: const Text('My Account'),
           onTap: () {
             Navigator.pop(context); // Close the drawer
@@ -36,6 +46,7 @@ class Tooblar extends StatelessWidget {
           },
         ),
         ListTile(
+          leading: const Icon(Icons.history),
           title: const Text('My Recycle History'),
           onTap: () {
             Navigator.pop(context); // Close the drawer

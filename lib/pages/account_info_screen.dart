@@ -3,14 +3,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 
-class AccountInfo extends StatefulWidget {
-  const AccountInfo({super.key});
+class AccountInfoScreen extends StatefulWidget {
+  const AccountInfoScreen({super.key});
 
   @override
-  State<AccountInfo> createState() => _AccountInfoState();
+  State<AccountInfoScreen> createState() => _AccountInfoState();
 }
 
-class _AccountInfoState extends State<AccountInfo> {
+class _AccountInfoState extends State<AccountInfoScreen> {
 
   late Future<Map<String, dynamic>> userDataFuture;
 

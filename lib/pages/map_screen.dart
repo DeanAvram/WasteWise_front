@@ -62,7 +62,14 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Map App'),
+        title: 
+          const Text(
+            'WasteWise',
+            style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold)),
+          backgroundColor: Colors.white,
+          centerTitle: true,
       ),
       drawer: const Tooblar(),
       body: Stack(
@@ -123,7 +130,7 @@ class _MapScreenState extends State<MapScreen> {
 
 
 void changeMapMode(GoogleMapController mapController) {
-    getJsonFile("assets/map_style.json")
+    getJsonFile("assets/map_styles/day_map.json")
         .then((value) => setMapStyle(value, mapController));
 }
 
