@@ -9,28 +9,26 @@ class Tooblar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
     child: ListView(
-      padding: EdgeInsets.zero,
       children: [
         Container(
           color: Colors.white,
           child: SizedBox(
-            height: 100.0,
+            height: 150.0,
             child: 
             DrawerHeader(
-              padding: const EdgeInsets.only(top: 15, left: 10), // Adjust the padding as needed
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+              padding: const EdgeInsets.only(top: 5), // Adjust the padding as needed
+              child: Column(
                 children: [
                   const Text(
                     'Toolbar',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 24,
+                      fontSize: 16,
                     ),
                   ),
-                  const SizedBox(width: 10.0),
                   Image.asset(
-                    'assets/logos/logo-black-nobackground.png'
+                    'assets/logos/logo-black-nobackground.png',
+                    height: 100.0,
                     )
                 ],
               ),
