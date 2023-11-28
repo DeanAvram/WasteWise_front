@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:map_app/pages/map_screen.dart';
+import 'package:map_app/pages/login_screen.dart';
 
 void main() {
   runApp(const MapApp());
@@ -11,7 +11,7 @@ class MapApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: MapScreen()
+      home: LoginScreen()
     );
   }
 }
