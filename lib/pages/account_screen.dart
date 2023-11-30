@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:map_app/pages/account_info_screen.dart';
 
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
+  final String name, email, password, role;
+  const AccountScreen({super.key, required this.name, required this.email, required this.password, required this.role});
+
+  String get userName => name;
+  String get userEmail => email;
+  String get userPassword => password;
+  String get userRole => role;
 
   @override
   Widget build(BuildContext context) {
@@ -11,9 +17,9 @@ class AccountScreen extends StatelessWidget {
         title: const Text('Account'),
         backgroundColor: Colors.blue,
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(2.0),
-        child: AccountInfoScreen(),
+      body: Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: AccountInfoScreen(name: userName, email: userEmail, password: userPassword, role: userRole),
       ),
     );
   }

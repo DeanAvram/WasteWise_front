@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,7 +7,8 @@ import 'package:map_app/pages/Tooblar.dart';
 
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  final String name, email, password, role;
+  const MapScreen({super.key, required this.name, required this.email, required this.password, required this.role});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -16,7 +16,12 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   GoogleMapController? mapController;
-  Position? currentPosition; // To store the user's current position
+  Position? currentPosition;
+  
+  String get name => widget.name;
+  String get email => widget.email;
+  String get password => widget.password;
+  String get role => widget.role;
 
   @override
   void initState() {
@@ -71,7 +76,7 @@ class _MapScreenState extends State<MapScreen> {
           backgroundColor: Colors.white,
           centerTitle: true,
       ),
-      drawer: const Tooblar(),
+      drawer: Tooblar(name: name, email: email, password: password, role: role),
       body: Stack(
         children: [
           GoogleMap(

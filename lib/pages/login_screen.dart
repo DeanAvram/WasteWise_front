@@ -1,8 +1,8 @@
-// ignore_for_file: avoid_print
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:map_app/pages/map_screen.dart';
+
 
 
 class LoginScreen extends StatefulWidget {
@@ -26,13 +26,10 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
-  Future<int> getUserData(String email, String password) async {
+  Future<Response> getUserData(String email, String password) async {
     try{
       String url = 'http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=$email&password=$password';
-      final response = await get(Uri.parse(url));
-      return response.statusCode;
-      //print(response.body);
-      //return response.statusCode;
+      return await get(Uri.parse(url));
     }
     catch(e){
       throw Exception();
@@ -101,22 +98,24 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () async {
-                  // Implement login logic 
-                  int statusCode = await getUserData(email, password);
-                  if (statusCode == 200){
+                  // Implement login logic
+                  Response response = await getUserData(email, password);
+                  if (response.statusCode == 200){
                       if (mounted){
+                        Map<String, dynamic> data = json.decode(response.body);
+
                         Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const MapScreen()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => MapScreen(name: data['name'], email: data['email'], password: password, role: data['role'],)));
                       }    
                   }
-                  else if (statusCode == 404){
+                  else if (response.statusCode == 404){
                     //trying to log in with email that doesn't exist
                     setState(() {
                       isWrongEmail = true;
                       isWrongPassword = false;
                     });
                   }
-                  else if (statusCode == 401){
+                  else if (response.statusCode == 401){
                     //wrong password
                     setState(() {
                       isWrongEmail = false;

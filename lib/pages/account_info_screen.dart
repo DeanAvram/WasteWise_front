@@ -4,7 +4,8 @@ import 'dart:convert';
 
 
 class AccountInfoScreen extends StatefulWidget {
-  const AccountInfoScreen({super.key});
+  final String name, email, password, role;
+  const AccountInfoScreen({super.key, required this.name, required this.email, required this.password, required this.role});
 
   @override
   State<AccountInfoScreen> createState() => _AccountInfoState();
@@ -14,6 +15,11 @@ class _AccountInfoState extends State<AccountInfoScreen> {
 
   late Future<Map<String, dynamic>> userDataFuture;
 
+  String get name => widget.name;
+  String get email => widget.email;
+  String get password => widget.password;
+  String get role => widget.role;
+
   @override
   void initState() {
     super.initState();
@@ -22,7 +28,9 @@ class _AccountInfoState extends State<AccountInfoScreen> {
 
   Future<Map<String, dynamic>> getUserData() async {
     try{
-      final response = await http.get(Uri.parse('http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=user@gmail.com&password=Aabcd1234!'), );
+      String url = 'http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=$email&password=$password';
+      final response = await http.get(Uri.parse(url));
+      //final response = await http.get(Uri.parse('http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=user@gmail.com&password=Aabcd1234!'), );
       if (response.statusCode == 200) {
         // If server returns an OK response, parse the JSON
         return json.decode(response.body);

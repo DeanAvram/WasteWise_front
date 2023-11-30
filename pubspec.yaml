@@ -33,6 +33,7 @@ dependencies:
   google_maps_flutter: ^2.0.10 # Use the latest version available
   geolocator: ^7.6.2
   http: ^1.1.0
+  provider: ^6.1.1
 
 
 
