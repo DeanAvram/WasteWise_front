@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:map_app/pages/map_screen.dart';
+import 'package:map_app/pages/register_screen.dart';
 
 
 
@@ -16,14 +17,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String email = 'user@gmail.com';
   String password = 'Aabcd1234!';
-  bool isWrongEmail = false;
-  bool isWrongPassword = false;
+  late bool _isWrongEmail;
+  late bool _isWrongPassword;
   //initail values for testing
   late Future<Map<String, dynamic>> userDataFuture;
   
   @override
   void initState() {
     super.initState();
+    _isWrongEmail = false;
+    _isWrongPassword = false;
   }
 
   Future<Response> getUserData(String email, String password) async {
@@ -74,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 32.0),
               Visibility(
-                visible: isWrongEmail,
+                visible: _isWrongEmail,
                 child: const Text(
                   "Wrong Email",
                   style: TextStyle(
@@ -85,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 )
               ),
               Visibility(
-                visible: isWrongPassword,
+                visible: _isWrongPassword,
                 child: const Text(
                   "Wrong Pasword",
                   style: TextStyle(
@@ -96,38 +99,56 @@ class _LoginScreenState extends State<LoginScreen> {
                 )
               ),  
               const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () async {
-                  // Implement login logic
-                  Response response = await getUserData(email, password);
-                  if (response.statusCode == 200){
-                      if (mounted){
-                        Map<String, dynamic> data = json.decode(response.body);
-
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => MapScreen(name: data['name'], email: data['email'], password: password, role: data['role'],)));
-                      }    
-                  }
-                  else if (response.statusCode == 404){
-                    //trying to log in with email that doesn't exist
-                    setState(() {
-                      isWrongEmail = true;
-                      isWrongPassword = false;
-                    });
-                  }
-                  else if (response.statusCode == 401){
-                    //wrong password
-                    setState(() {
-                      isWrongEmail = false;
-                      isWrongPassword = true;
-                    });
-                  }
+              Column(
+                children: [
                   
-                  //print('Email: $email');
-                  //print('Password: $password');
-                },
-                child: const Text('Login'),
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Implement login logic
+                      Response response = await getUserData(email, password);
+                      if (response.statusCode == 200){
+                          if (mounted){
+                            Map<String, dynamic> data = json.decode(response.body);
+                  
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => MapScreen(name: data['name'], email: data['email'], password: password, role: data['role'],)));
+                          }    
+                      }
+                      else if (response.statusCode == 404){
+                        //trying to log in with email that doesn't exist
+                        setState(() {
+                          _isWrongEmail = true;
+                          _isWrongPassword = false;
+                        });
+                      }
+                      else if (response.statusCode == 401){
+                        //wrong password
+                        setState(() {
+                          _isWrongEmail = false;
+                          _isWrongPassword = true;
+                        });
+                      }
+                    },
+                    child: const Text('Login'),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Don\'t have an account? '),
+                      TextButton(
+                        onPressed: () {
+                          // Navigate to the Register page
+                          Navigator.pop(context);
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterScreen()));
+                        },
+                        child: const Text('Register'),
+                      ),
+                    ],
+                  )
+                ],
               ),
+              
               
             ],
           ),
