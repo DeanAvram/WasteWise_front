@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:map_app/pages/account_screen.dart';
-
+import 'package:map_app/pages/login_screen.dart';
 
 class Tooblar extends StatelessWidget {
   final String name, email, password, role;
@@ -15,29 +15,28 @@ class Tooblar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       width: 250,
-      child: ListView(
+      child: Column(
         children: [
           Container(
             color: Colors.white,
             child: SizedBox(
               height: 100.0,
-              child: 
-              DrawerHeader(
-                padding: const EdgeInsets.only(top: 5), // Adjust the padding as needed
+              child: DrawerHeader(
+                padding: const EdgeInsets.only(top: 5),
                 child: Row(
                   children: [
                     Image.asset(
                       'assets/logos/logo-black-nobackground.png',
                       height: 100.0,
-                      ),
+                    ),
                     Text(
                       userName,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 20,
-                        fontWeight: FontWeight.bold
+                        fontWeight: FontWeight.bold,
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -58,10 +57,25 @@ class Tooblar extends StatelessWidget {
               //Navigator.pop(context); // Close the drawer
               //Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountScreen()));
             },
-          )
+          ),
           // Add more items as needed
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Align(
+                alignment: FractionalOffset.bottomLeft,
+                child: TextButton.icon(
+                  onPressed: (){
+                    Navigator.pop(context); // Close the drawer
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                  }, 
+                  icon: const Icon(Icons.logout), 
+                  label: const Text('Log Out'))
+              ),
+            ),
+          ),
         ],
       ),
-  );
+    );
   }
 }
