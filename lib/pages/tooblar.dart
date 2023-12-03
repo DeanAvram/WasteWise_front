@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:map_app/pages/account_screen.dart';
 import 'package:map_app/pages/login_screen.dart';
+import 'package:map_app/pages/recycle_history_screen.dart';
 
 class Tooblar extends StatelessWidget {
   final String name, email, password, role;
@@ -54,8 +55,8 @@ class Tooblar extends StatelessWidget {
             leading: const Icon(Icons.history),
             title: const Text('My Recycle History'),
             onTap: () {
-              //Navigator.pop(context); // Close the drawer
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountScreen()));
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const RecycleHistoryScreen()));
             },
           ),
           // Add more items as needed
