@@ -4,7 +4,9 @@ import 'package:http/http.dart' as http;
 
 
 class RecycleHistoryScreen extends StatefulWidget {
-  const RecycleHistoryScreen({super.key});
+  final String name, email, password, role;
+  const RecycleHistoryScreen({super.key, required this.name, required this.email, required this.password, required this.role});
+
 
    @override
   State<RecycleHistoryScreen> createState() => _RecycleHistoryScreenState();
@@ -13,6 +15,11 @@ class RecycleHistoryScreen extends StatefulWidget {
 class _RecycleHistoryScreenState extends State<RecycleHistoryScreen> {
   List<dynamic> _dataList = [];
 
+  String get name => widget.name;
+  String get email => widget.email;
+  String get password => widget.password;
+  String get role => widget.role;
+
   @override
   void initState() {
     super.initState();
@@ -20,9 +27,8 @@ class _RecycleHistoryScreenState extends State<RecycleHistoryScreen> {
   }
 
   Future<void> fetchData() async {
-    //TODO: Pass username and paasword dyncamiclly
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:5000/wastewise/commands?email=user@gmail.com&password=Aabcd1234!'),
+      Uri.parse('http://127.0.0.1:5000/wastewise/commands?email=$email&password=$password'),
       headers: {
         'Content-Type': 'application/json'
       },
@@ -34,8 +40,7 @@ class _RecycleHistoryScreenState extends State<RecycleHistoryScreen> {
       }),
     );
     
-    if (response.statusCode == 201) {
-      // If the server returns a 200 OK response, parse the JSON data
+    if (response.statusCode == 201){
       setState(() {
         _dataList = json.decode(response.body);
       });
@@ -65,8 +70,7 @@ class _RecycleHistoryScreenState extends State<RecycleHistoryScreen> {
                     style: const TextStyle(fontSize: 18.0,
                                           fontWeight: FontWeight.bold)
                    ),
-                  subtitle: Text(_dataList[index]['data']['prediction_time']),
-                  // Add more widgets to display other data as needed
+                  subtitle: Text(_dataList[index]['data']['prediction_time'])
                 );
               },
             ),

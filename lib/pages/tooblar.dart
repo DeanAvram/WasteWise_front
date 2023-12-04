@@ -56,7 +56,9 @@ class Tooblar extends StatelessWidget {
             title: const Text('My Recycle History'),
             onTap: () {
               Navigator.pop(context); // Close the drawer
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const RecycleHistoryScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => RecycleHistoryScreen(
+              name: userName, email: userEmail, password: userPassword, role: userRole)
+              ));
             },
           ),
           // Add more items as needed
