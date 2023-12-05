@@ -34,6 +34,8 @@ dependencies:
   geolocator: ^7.6.2
   http: ^1.1.0
   provider: ^6.1.1
+  flutter_dotenv: ^5.0.2
+
 
 
 
@@ -71,6 +73,7 @@ flutter:
   assets:
    - assets/map_styles/
    - assets/logos/
+   - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

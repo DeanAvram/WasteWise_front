@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 class RecycleHistoryScreen extends StatefulWidget {
@@ -27,8 +28,10 @@ class _RecycleHistoryScreenState extends State<RecycleHistoryScreen> {
   }
 
   Future<void> fetchData() async {
+    await dotenv.load(fileName: ".env");
+    String? baseUrl = dotenv.env['BASE_URL'];
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:5000/wastewise/commands?email=$email&password=$password'),
+      Uri.parse('$baseUrl/commands?email=$email&password=$password'),
       headers: {
         'Content-Type': 'application/json'
       },

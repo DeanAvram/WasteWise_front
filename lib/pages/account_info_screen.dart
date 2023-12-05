@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 class AccountInfoScreen extends StatefulWidget {
@@ -28,7 +29,9 @@ class _AccountInfoState extends State<AccountInfoScreen> {
 
   Future<Map<String, dynamic>> getUserData() async {
     try{
-      String url = 'http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=$email&password=$password';
+      await dotenv.load(fileName: ".env");
+      String? baseUrl = dotenv.env['BASE_URL'];
+      String url = '$baseUrl/users/user@gmail.com?email=$email&password=$password';
       final response = await http.get(Uri.parse(url));
       //final response = await http.get(Uri.parse('http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=user@gmail.com&password=Aabcd1234!'), );
       if (response.statusCode == 200) {

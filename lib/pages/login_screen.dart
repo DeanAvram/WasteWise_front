@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:map_app/pages/map_screen.dart';
 import 'package:map_app/pages/register_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 
@@ -31,7 +32,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<Response> getUserData(String email, String password) async {
     try{
-      String url = 'http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=$email&password=$password';
+      await dotenv.load(fileName: ".env");
+      String? baseUrl = dotenv.env['BASE_URL'];
+      String url = '$baseUrl/users/user@gmail.com?email=$email&password=$password';
       return await get(Uri.parse(url));
     }
     catch(e){

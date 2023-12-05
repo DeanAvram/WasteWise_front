@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:map_app/pages/login_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 class RegisterScreen extends StatefulWidget {
@@ -36,8 +37,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> registerUser() async {
-    const String url = 'http://127.0.0.1:5000/wastewise/users'; // Replace with your actual API endpoint
-
+    await dotenv.load(fileName: ".env");
+    String? baseUrl = dotenv.env['BASE_URL'];
+    String url = '$baseUrl/users'; // Replace with your actual API endpoint
     Map<String, dynamic> data = {
       'name': nameController.text,
       'email': emailController.text,
