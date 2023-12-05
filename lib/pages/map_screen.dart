@@ -63,74 +63,77 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: 
-          const Text(
-            'WasteWise',
-            style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold)),
-          backgroundColor: Colors.white,
-          centerTitle: true,
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text(
+        'WasteWise',
+        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
-      drawer: Tooblar(name: name, email: email, password: password, role: role),
-      body: Stack(
-        children: [
-          GoogleMap(
-            onMapCreated: (GoogleMapController controller) {
-              changeMapMode(controller);
-              if (mounted) {
-                setState(() {
-                  mapController = controller;
-                });
-              }
-            },
-            initialCameraPosition: CameraPosition(
-              target: LatLng(
-                currentPosition?.latitude ?? 37.7749,
-                currentPosition?.longitude ?? -122.4194,
-              ), // Use the current position or fallback to San Francisco, CA
-              zoom: 17.0,
-            ),
-            markers: <Marker>{
-                Marker(
-                  markerId: const MarkerId("user_location"),
-                  position: LatLng(
-                    currentPosition?.latitude ?? 37.7749,
-                    currentPosition?.longitude ?? -122.4194,
+      backgroundColor: Colors.white,
+      centerTitle: true,
+    ),
+    drawer: Tooblar(name: name, email: email, password: password, role: role),
+    body: currentPosition != null
+        ? Stack(
+            children: [
+              GoogleMap(
+                onMapCreated: (GoogleMapController controller) {
+                  changeMapMode(controller);
+                  if (mounted) {
+                    setState(() {
+                      mapController = controller;
+                    });
+                  }
+                },
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(
+                    currentPosition!.latitude,
+                    currentPosition!.longitude,
                   ),
-                  infoWindow: const InfoWindow(title: "Your Location"),
+                  zoom: 17.0,
                 ),
-              },
-          ),
-          Positioned(
-            bottom: 16,
-            left: MediaQuery.of(context).size.width / 2 - 28,
-            child: FloatingActionButton(
-              onPressed: () {
-                getCurrentLocation();
-                mapController?.animateCamera(
-                  CameraUpdate.newCameraPosition(
-                    CameraPosition(
-                      target: LatLng(
-                        currentPosition?.latitude ?? 37.7749,
-                        currentPosition?.longitude ?? -122.4194,
-                      ),
-                      zoom: 17.0,
+                markers: <Marker>{
+                  Marker(
+                    markerId: const MarkerId("user_location"),
+                    position: LatLng(
+                      currentPosition!.latitude,
+                      currentPosition!.longitude,
                     ),
+                    infoWindow: const InfoWindow(title: "Your Location"),
                   ),
-                );
-              },
-              child: const Icon(Icons.location_searching),
-            ),
+                },
+              ),
+              Positioned(
+                bottom: 16,
+                left: MediaQuery.of(context).size.width / 2 - 28,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    getCurrentLocation();
+                    mapController?.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(
+                          target: LatLng(
+                            currentPosition!.latitude,
+                            currentPosition!.longitude,
+                          ),
+                          zoom: 17.0,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Icon(Icons.location_searching),
+                ),
+              ),
+            ],
+          )
+        : const Center(
+            child: CircularProgressIndicator(), // Show a loading indicator
           ),
-        ],
-      ),
-    );
-  }
+  );
+}
+
 }
 
 
