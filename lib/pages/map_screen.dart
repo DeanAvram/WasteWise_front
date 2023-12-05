@@ -4,11 +4,17 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_app/pages/Tooblar.dart';
-
+import 'package:camera/camera.dart';
+import 'package:map_app/pages/camera_screen.dart';
 
 class MapScreen extends StatefulWidget {
   final String name, email, password, role;
-  const MapScreen({super.key, required this.name, required this.email, required this.password, required this.role});
+  const MapScreen(
+      {super.key,
+      required this.name,
+      required this.email,
+      required this.password,
+      required this.role});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -17,7 +23,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   GoogleMapController? mapController;
   Position? currentPosition;
-  
+
   String get name => widget.name;
   String get email => widget.email;
   String get password => widget.password;
@@ -26,7 +32,6 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    //getCurrentLocation();
     initializeMap();
   }
 
@@ -52,7 +57,7 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> getCurrentLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best ,
+        desiredAccuracy: LocationAccuracy.best,
       );
       setState(() {
         currentPosition = position;
@@ -63,91 +68,81 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
- @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text(
-        'WasteWise',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'WasteWise',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.white,
+        centerTitle: true,
       ),
-      backgroundColor: Colors.white,
-      centerTitle: true,
-    ),
-    drawer: Tooblar(name: name, email: email, password: password, role: role),
-    body: currentPosition != null
-        ? Stack(
-            children: [
-              GoogleMap(
-                onMapCreated: (GoogleMapController controller) {
-                  changeMapMode(controller);
-                  if (mounted) {
-                    setState(() {
-                      mapController = controller;
-                    });
-                  }
-                },
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(
-                    currentPosition!.latitude,
-                    currentPosition!.longitude,
-                  ),
-                  zoom: 17.0,
-                ),
-                markers: <Marker>{
-                  Marker(
-                    markerId: const MarkerId("user_location"),
-                    position: LatLng(
+      drawer: Tooblar(name: name, email: email, password: password, role: role),
+      body: currentPosition != null
+          ? Stack(
+              children: [
+                GoogleMap(
+                  onMapCreated: (GoogleMapController controller) {
+                    changeMapMode(controller);
+                    if (mounted) {
+                      setState(() {
+                        mapController = controller;
+                      });
+                    }
+                  },
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(
                       currentPosition!.latitude,
                       currentPosition!.longitude,
                     ),
-                    infoWindow: const InfoWindow(title: "Your Location"),
+                    zoom: 17.0,
                   ),
-                },
-              ),
-              Positioned(
-                bottom: 16,
-                left: MediaQuery.of(context).size.width / 2 - 28,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    getCurrentLocation();
-                    mapController?.animateCamera(
-                      CameraUpdate.newCameraPosition(
-                        CameraPosition(
-                          target: LatLng(
-                            currentPosition!.latitude,
-                            currentPosition!.longitude,
-                          ),
-                          zoom: 17.0,
-                        ),
+                  markers: <Marker>{
+                    Marker(
+                      markerId: const MarkerId("user_location"),
+                      position: LatLng(
+                        currentPosition!.latitude,
+                        currentPosition!.longitude,
                       ),
-                    );
+                      infoWindow: const InfoWindow(title: "Your Location"),
+                    ),
                   },
-                  child: const Icon(Icons.location_searching),
                 ),
-              ),
-            ],
-          )
-        : const Center(
-            child: CircularProgressIndicator(), // Show a loading indicator
-          ),
-  );
+                Positioned(
+                  bottom: 16,
+                  left: MediaQuery.of(context).size.width / 2 - 28,
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      await availableCameras().then((value) => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => CameraScreen(cameras: value))));
+                    },
+                    child: const Icon(Icons.camera_alt_outlined),
+                  ),
+                ),
+              ],
+            )
+          : const Center(
+              child: CircularProgressIndicator(), // Show a loading indicator
+            ),
+    );
+  }
 }
-
-}
-
 
 void changeMapMode(GoogleMapController mapController) {
-    getJsonFile("assets/map_styles/day_map.json")
-        .then((value) => setMapStyle(value, mapController));
+  getJsonFile("assets/map_styles/day_map.json")
+      .then((value) => setMapStyle(value, mapController));
 }
 
 void setMapStyle(String mapStyle, GoogleMapController mapController) {
-    mapController.setMapStyle(mapStyle);
+  mapController.setMapStyle(mapStyle);
 }
 
 Future<String> getJsonFile(String path) async {
-    ByteData byte = await rootBundle.load(path);
-    var list = byte.buffer.asUint8List(byte.offsetInBytes,byte.lengthInBytes);
-    return utf8.decode(list);
-  }
+  ByteData byte = await rootBundle.load(path);
+  var list = byte.buffer.asUint8List(byte.offsetInBytes, byte.lengthInBytes);
+  return utf8.decode(list);
+}
