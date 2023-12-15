@@ -2,20 +2,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'dart:io';
-import 'dart:convert';
-import 'package:image_picker/image_picker.dart';
-import 'package:map_app/pages/image_screen.dart';
+//import 'dart:io';
+//import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:typed_data';
-import 'package:http_parser/http_parser.dart';
-
-
 
 class CameraScreen extends StatefulWidget {
   final List<CameraDescription>? cameras;
-  const CameraScreen({Key? key, required this.cameras}) : super(key: key);
+  final String name, email, password, role;
+
+  const CameraScreen(
+      {Key? key,
+      required this.name,
+      required this.email,
+      required this.password,
+      required this.role,
+      required this.cameras})
+      : super(key: key);
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -24,8 +27,14 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
-  File? _image;
-  final ImagePicker _picker = ImagePicker();
+  String status = "";
+
+  //final ImagePicker _picker = ImagePicker();
+
+  String get name => widget.name;
+  String get email => widget.email;
+  String get password => widget.password;
+  String get role => widget.role;
 
   @override
   void initState() {
@@ -41,33 +50,32 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  Future getImage() async {
+  /*Future getImageFromDevice() async {
     //choose image from device
     final image = await _picker.pickImage(source: ImageSource.camera);
     setState(() {
       _image = File(image!.path);
     });
+  }*/
+
+  void uploadImage() async {
+    final XFile imageFile = await _cameraController.takePicture();
+
+    String? baseUrl = dotenv.env['BASE_URL'];
+    String url = '$baseUrl/predict?email=$email&password=$password';
+
+    final bytes = await imageFile.readAsBytes();
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: bytes,
+      headers: {'Content-Type': 'image/jpeg'},
+    );
+
+    setState(() {
+      status = response.statusCode.toString();
+    });
   }
-
-  /*void uploadImage(String imagePath) async {
-    try{
-      String email = 'user@gmail.com';
-      String password = 'Aabcd1234!';
-      Uri url = Uri.parse('${dotenv.env['BASE_URL']}/predict?email=$email&password=$password');
-      var request = http.MultipartRequest("POST", url);
-      Uri path = Uri.parse(imagePath);
-      File f = await toFile
-      print("fgg");
-      request.files.add(http.MultipartFile.fromBytes('file', await File.fromUri(path).readAsBytes(), contentType: MediaType('image', 'jpeg')));
-      request.send().then((response) {
-        if (response.statusCode == 200) print("Uploaded!");
-      });
-    }catch(e){
-      print(e);
-    }
-}*/
-  
-
 
   @override
   Widget build(BuildContext context) {
@@ -98,26 +106,17 @@ class _CameraScreenState extends State<CameraScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(status),
                 ElevatedButton(
-                  onPressed: ()async{
+                  onPressed: () async {
                     try {
                       // Ensure that the camera is initialized.
-                        await _initializeControllerFuture;
-
-                        // Attempt to take a picture and then get the location
-                        // where the image file is saved.
-                        final image = await _cameraController.takePicture();
-                        print(image.path);
-                        if (mounted){
-                          Navigator.pop(context);
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => ImageScreen(imagePath: image.path)));
-                        }  
-                        //uploadImage(image.path);
-                      } catch (e) {
-                        // If an error occurs, log the error to the console.
-                        print(e);
-                      }
-                    
+                      await _initializeControllerFuture;
+                      uploadImage();
+                    } catch (e) {
+                      // If an error occurs, log the error to the console.
+                      print(e);
+                    }
                   },
                   child: const Icon(Icons.camera),
                 ),

@@ -118,7 +118,12 @@ class _MapScreenState extends State<MapScreen> {
                       await availableCameras().then((value) => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => CameraScreen(cameras: value))));
+                              builder: (_) => CameraScreen(
+                                  name: name,
+                                  email: email,
+                                  password: password,
+                                  role: role,
+                                  cameras: value))));
                     },
                     child: const Icon(Icons.camera_alt_outlined),
                   ),
