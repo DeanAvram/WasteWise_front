@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 //import 'dart:io';
@@ -28,6 +30,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
   String status = "";
+  String pred = "";
 
   //final ImagePicker _picker = ImagePicker();
 
@@ -74,6 +77,8 @@ class _CameraScreenState extends State<CameraScreen> {
 
     setState(() {
       status = response.statusCode.toString();
+      Map<String, dynamic> jsonMap = json.decode(response.body);
+      pred = jsonMap['prediction'];
     });
   }
 
@@ -106,7 +111,7 @@ class _CameraScreenState extends State<CameraScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(status),
+                Text("$status  $pred"),
                 ElevatedButton(
                   onPressed: () async {
                     try {

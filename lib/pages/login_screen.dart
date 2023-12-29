@@ -5,8 +5,6 @@ import 'package:map_app/pages/map_screen.dart';
 import 'package:map_app/pages/register_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -15,14 +13,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   String email = 'user@gmail.com';
-  String password = 'Aabcd1234!';
+  String password = 'Abcd1234!';
   late bool _isWrongEmail;
   late bool _isWrongPassword;
   //initail values for testing
   late Future<Map<String, dynamic>> userDataFuture;
-  
+
   @override
   void initState() {
     super.initState();
@@ -31,13 +28,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<Response> getUserData(String email, String password) async {
-    try{
+    try {
       await dotenv.load(fileName: ".env");
       String? baseUrl = dotenv.env['BASE_URL'];
-      String url = '$baseUrl/users/user@gmail.com?email=$email&password=$password';
+      String url =
+          '$baseUrl/users/user@gmail.com?email=$email&password=$password';
       return await get(Uri.parse(url));
-    }
-    catch(e){
+    } catch (e) {
       throw Exception();
     }
   }
@@ -54,9 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/logos/logo-black.png'
-              ),
+              Image.asset('assets/logos/logo-black.png'),
               TextFormField(
                 onChanged: (value) {
                   setState(() {
@@ -80,51 +75,53 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 32.0),
               Visibility(
-                visible: _isWrongEmail,
-                child: const Text(
-                  "Wrong Email",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold
-                  ),
-                )
-              ),
+                  visible: _isWrongEmail,
+                  child: const Text(
+                    "Wrong Email",
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  )),
               Visibility(
-                visible: _isWrongPassword,
-                child: const Text(
-                  "Wrong Pasword",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold
-                  ),
-                )
-              ),  
+                  visible: _isWrongPassword,
+                  child: const Text(
+                    "Wrong Pasword",
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  )),
               const SizedBox(height: 16.0),
               Column(
                 children: [
-                  
                   ElevatedButton(
                     onPressed: () async {
                       // Implement login logic
                       Response response = await getUserData(email, password);
-                      if (response.statusCode == 200){
-                          if (mounted){
-                            Map<String, dynamic> data = json.decode(response.body);
-                  
-                            Navigator.pop(context);
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => MapScreen(name: data['name'], email: data['email'], password: password, role: data['role'],)));
-                          }    
-                      }
-                      else if (response.statusCode == 404){
+                      if (response.statusCode == 200) {
+                        if (mounted) {
+                          Map<String, dynamic> data =
+                              json.decode(response.body);
+
+                          Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MapScreen(
+                                        name: data['name'],
+                                        email: data['email'],
+                                        password: password,
+                                        role: data['role'],
+                                      )));
+                        }
+                      } else if (response.statusCode == 404) {
                         //trying to log in with email that doesn't exist
                         setState(() {
                           _isWrongEmail = true;
                           _isWrongPassword = false;
                         });
-                      }
-                      else if (response.statusCode == 401){
+                      } else if (response.statusCode == 401) {
                         //wrong password
                         setState(() {
                           _isWrongEmail = false;
@@ -143,7 +140,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           // Navigate to the Register page
                           Navigator.pop(context);
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterScreen()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const RegisterScreen()));
                         },
                         child: const Text('Register'),
                       ),
@@ -151,13 +152,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   )
                 ],
               ),
-              
-              
             ],
           ),
         ),
       ),
-      
     );
   }
 }
