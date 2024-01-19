@@ -3,17 +3,20 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-
 class AccountInfoScreen extends StatefulWidget {
   final String name, email, password, role;
-  const AccountInfoScreen({super.key, required this.name, required this.email, required this.password, required this.role});
+  const AccountInfoScreen(
+      {super.key,
+      required this.name,
+      required this.email,
+      required this.password,
+      required this.role});
 
   @override
   State<AccountInfoScreen> createState() => _AccountInfoState();
 }
 
 class _AccountInfoState extends State<AccountInfoScreen> {
-
   late Future<Map<String, dynamic>> userDataFuture;
 
   String get name => widget.name;
@@ -28,10 +31,11 @@ class _AccountInfoState extends State<AccountInfoScreen> {
   }
 
   Future<Map<String, dynamic>> getUserData() async {
-    try{
+    try {
       await dotenv.load(fileName: ".env");
       String? baseUrl = dotenv.env['BASE_URL'];
-      String url = '$baseUrl/users/user@gmail.com?email=$email&password=$password';
+      String url =
+          '$baseUrl/users/user@gmail.com?email=$email&password=$password';
       final response = await http.get(Uri.parse(url));
       //final response = await http.get(Uri.parse('http://127.0.0.1:5000/wastewise/users/user@gmail.com?email=user@gmail.com&password=Aabcd1234!'), );
       if (response.statusCode == 200) {
@@ -42,57 +46,63 @@ class _AccountInfoState extends State<AccountInfoScreen> {
         // throw an exception.
         throw Exception('Failed to load data');
       }
-    }
-    catch(e){
+    } catch (e) {
       throw Exception('Failed to load data');
     }
   }
 
-  
-
-  FutureBuilder buildFutureBuilder(String key){
+  FutureBuilder buildFutureBuilder(String key) {
     return FutureBuilder(
-            future: userDataFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                return Text(
-                  '${snapshot.data[key]}',
-                  style: const TextStyle(
-                    fontSize: 16
-                  ),
-                );
-              }
-            },
+      future: userDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          return Text(
+            '${snapshot.data[key]}',
+            style: const TextStyle(fontSize: 16, color: Colors.white),
           );
-}
+        }
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200.0,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Name',
-            style: TextStyle(
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(
+          255, 40, 45, 50), // Set the background color to black
+      body: Container(
+        color: const Color.fromARGB(255, 40, 45,
+            50), // Set the background color again for the entire body
+        child: SizedBox(
+          height: 200.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Name',
+                style: TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              buildFutureBuilder('name'),
+              const SizedBox(height: 10),
+              const Text(
+                'Mail',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              buildFutureBuilder('email'),
+            ],
           ),
-          buildFutureBuilder('name'),
-          const SizedBox(height: 10),
-          const Text(
-            'Mail',
-            style: TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          buildFutureBuilder('email')
-        ],
+        ),
       ),
     );
   }
