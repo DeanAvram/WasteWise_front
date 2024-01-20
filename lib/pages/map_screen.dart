@@ -33,6 +33,7 @@ class _MapScreenState extends State<MapScreen> {
   String get role => widget.role;
 
   List<Marker> markers = [];
+  bool _markerLoaded = false;
 
   @override
   void initState() {
@@ -98,7 +99,7 @@ class _MapScreenState extends State<MapScreen> {
     markers.addAll([otherLocation1, otherLocation2]);
   }
 
-  void getAllPlaces() async {
+  Future<void> getAllPlaces() async {
     await dotenv.load(fileName: ".env");
     String? baseUrl = dotenv.env['BASE_URL'];
     final response = await http.post(
@@ -119,14 +120,19 @@ class _MapScreenState extends State<MapScreen> {
         double lng = item['data']['location']['coordinates'][0];
         double lat = item['data']['location']['coordinates'][1];
         String name = item['data']['name'];
-        //const String name = 'garbage';
+        String type = item['data']['bin_type'];
         Marker location = Marker(
           markerId: MarkerId(name),
           position: LatLng(lat, lng),
-          infoWindow: InfoWindow(title: name),
+          infoWindow: InfoWindow(title: name, snippet: type),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
         );
         markers.add(location);
+      }
+      if (markers.length > 1) {
+        setState(() {
+          _markerLoaded = true;
+        });
       }
     }
     //print(response.body);
@@ -187,7 +193,7 @@ class _MapScreenState extends State<MapScreen> {
         centerTitle: true,
       ),
       drawer: Tooblar(name: name, email: email, password: password, role: role),
-      body: currentPosition != null
+      body: currentPosition != null && _markerLoaded
           ? Stack(
               children: [
                 GoogleMap(
