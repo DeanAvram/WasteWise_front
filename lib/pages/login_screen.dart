@@ -31,8 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await dotenv.load(fileName: ".env");
       String? baseUrl = dotenv.env['BASE_URL'];
-      String url =
-          '$baseUrl/users/user@gmail.com?email=$email&password=$password';
+      String url = '$baseUrl/users/$email?email=$email&password=$password';
       return await get(Uri.parse(url));
     } catch (e) {
       throw Exception();
