@@ -30,7 +30,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
   String status = "";
-  String pred = "";
+  String classify = "";
 
   //final ImagePicker _picker = ImagePicker();
 
@@ -65,7 +65,7 @@ class _CameraScreenState extends State<CameraScreen> {
     final XFile imageFile = await _cameraController.takePicture();
 
     String? baseUrl = dotenv.env['BASE_URL'];
-    String url = '$baseUrl/predict?email=$email&password=$password';
+    String url = '$baseUrl/classify?email=$email&password=$password';
 
     final bytes = await imageFile.readAsBytes();
 
@@ -78,7 +78,7 @@ class _CameraScreenState extends State<CameraScreen> {
     setState(() {
       status = response.statusCode.toString();
       Map<String, dynamic> jsonMap = json.decode(response.body);
-      pred = jsonMap['prediction'];
+      classify = jsonMap['classification'];
     });
   }
 
@@ -111,7 +111,7 @@ class _CameraScreenState extends State<CameraScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("$status  $pred"),
+                Text("$status  $classify"),
                 ElevatedButton(
                   onPressed: () async {
                     try {

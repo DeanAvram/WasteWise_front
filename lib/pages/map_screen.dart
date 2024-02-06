@@ -78,27 +78,6 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  // Function to add markers for additional locations
-  void addOtherLocationMarkers() {
-    // Add as many markers as needed with specific locations
-    Marker otherLocation1 = Marker(
-      markerId: const MarkerId("other_location_1"),
-      position: const LatLng(37.775, -122.418),
-      infoWindow: const InfoWindow(title: "Other Location 1"),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-    );
-
-    Marker otherLocation2 = Marker(
-      markerId: const MarkerId("other_location_2"),
-      position: const LatLng(37.776, -122.42),
-      infoWindow: const InfoWindow(title: "Other Location 2"),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-    );
-
-    // Add other location markers to the list
-    markers.addAll([otherLocation1, otherLocation2]);
-  }
-
   Future<void> getAllPlaces() async {
     await dotenv.load(fileName: ".env");
     String? baseUrl = dotenv.env['BASE_URL'];
@@ -121,11 +100,46 @@ class _MapScreenState extends State<MapScreen> {
         double lat = item['data']['location']['coordinates'][1];
         String name = item['data']['name'];
         String type = item['data']['bin_type'];
+        BitmapDescriptor icon;
+        if (type.contains('זכוכית')) {
+          icon = await BitmapDescriptor.fromAssetImage(
+              const ImageConfiguration(size: Size(15, 15)),
+              'assets/icons/glass_recycle_icon.png');
+        } else if (type.contains('קרטון')) {
+          icon = await BitmapDescriptor.fromAssetImage(
+              const ImageConfiguration(size: Size(15, 15)),
+              'assets/icons/cardboard_recycle_icon.png');
+        } else if (type.contains('אריזות')) {
+          icon = await BitmapDescriptor.fromAssetImage(
+              const ImageConfiguration(size: Size(15, 15)),
+              'assets/icons/packages_recycle_icon.png');
+        } else if (type.contains('טקסטיל')) {
+          icon = await BitmapDescriptor.fromAssetImage(
+              const ImageConfiguration(size: Size(15, 15)),
+              'assets/icons/textile_recycle_icon.png');
+        } else if (type.contains('נייר')) {
+          icon = await BitmapDescriptor.fromAssetImage(
+              const ImageConfiguration(size: Size(15, 15)),
+              'assets/icons/paper_recycle_icon.png');
+        } else if (type.contains('אלקטרונית')) {
+          icon = await BitmapDescriptor.fromAssetImage(
+              const ImageConfiguration(size: Size(15, 15)),
+              'assets/icons/electronic_recycle_icon.png');
+        } else if (type.contains('סוללות')) {
+          icon = await BitmapDescriptor.fromAssetImage(
+              const ImageConfiguration(size: Size(15, 15)),
+              'assets/icons/batteries_recycle_icon.png');
+        } else if (type.contains('סולארי')) {
+          continue;
+        } else {
+          icon =
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
+        }
         Marker location = Marker(
           markerId: MarkerId(name),
           position: LatLng(lat, lng),
           infoWindow: InfoWindow(title: name, snippet: type),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          icon: icon,
         );
         markers.add(location);
       }
@@ -193,7 +207,7 @@ class _MapScreenState extends State<MapScreen> {
         centerTitle: true,
       ),
       drawer: Tooblar(name: name, email: email, password: password, role: role),
-      body: currentPosition != null && _markerLoaded
+      body: currentPosition != null //&& _markerLoaded
           ? Stack(
               children: [
                 GoogleMap(
