@@ -73,13 +73,13 @@ class _RecycleHistoryScreenState extends State<RecycleHistoryScreen> {
               itemCount: _dataList.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                    title: Text(_dataList[index]['data']['prediction'],
+                    title: Text(_dataList[index]['data']['classification'],
                         style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold)),
                     subtitle: Text(
-                      _dataList[index]['data']['prediction_time'],
+                      _dataList[index]['data']['classification_time'],
                       style: const TextStyle(color: Colors.white),
                     ));
               },
