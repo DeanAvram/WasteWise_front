@@ -251,7 +251,8 @@ class _MapScreenState extends State<MapScreen> {
                                   email: email,
                                   password: password,
                                   role: role,
-                                  cameras: value))));
+                                  cameras: value,
+                                  currentLocation: currentPosition))));
                     },
                     child: const Icon(Icons.camera_alt_outlined),
                   ),

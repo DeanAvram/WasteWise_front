@@ -1,17 +1,15 @@
-// ignore_for_file: avoid_print
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-//import 'dart:io';
-//import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:map_app/pages/classification_dialog_screen.dart';
 
 class CameraScreen extends StatefulWidget {
-  final List<CameraDescription>? cameras;
   final String name, email, password, role;
+  final List<CameraDescription>? cameras;
+  final Position? currentLocation;
 
   const CameraScreen(
       {Key? key,
@@ -19,7 +17,8 @@ class CameraScreen extends StatefulWidget {
       required this.email,
       required this.password,
       required this.role,
-      required this.cameras})
+      required this.cameras,
+      required this.currentLocation})
       : super(key: key);
 
   @override
@@ -31,13 +30,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late Future<void> _initializeControllerFuture;
   String status = "";
   String classify = "";
-
-  //final ImagePicker _picker = ImagePicker();
-
-  String get name => widget.name;
-  String get email => widget.email;
-  String get password => widget.password;
-  String get role => widget.role;
+  bool _isTakingPicture = false;
 
   @override
   void initState() {
@@ -53,19 +46,16 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  /*Future getImageFromDevice() async {
-    //choose image from device
-    final image = await _picker.pickImage(source: ImageSource.camera);
+  void takePicture() async {
     setState(() {
-      _image = File(image!.path);
+      _isTakingPicture = true;
     });
-  }*/
 
-  void uploadImage() async {
     final XFile imageFile = await _cameraController.takePicture();
 
     String? baseUrl = dotenv.env['BASE_URL'];
-    String url = '$baseUrl/classify?email=$email&password=$password';
+    String url =
+        '$baseUrl/classify?email=${widget.email}&password=${widget.password}';
 
     final bytes = await imageFile.readAsBytes();
 
@@ -76,9 +66,18 @@ class _CameraScreenState extends State<CameraScreen> {
     );
 
     setState(() {
+      _isTakingPicture = false;
       status = response.statusCode.toString();
       Map<String, dynamic> jsonMap = json.decode(response.body);
       classify = jsonMap['classification'];
+      showDialog(
+        context: context,
+        builder: (context) => ClassificationScreen(
+            email: widget.email,
+            password: widget.password,
+            classification: classify,
+            currentLocation: widget.currentLocation),
+      );
     });
   }
 
@@ -111,20 +110,26 @@ class _CameraScreenState extends State<CameraScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("$status  $classify"),
                 ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      // Ensure that the camera is initialized.
-                      await _initializeControllerFuture;
-                      uploadImage();
-                    } catch (e) {
-                      // If an error occurs, log the error to the console.
-                      print(e);
-                    }
-                  },
-                  child: const Icon(Icons.camera),
-                ),
+                  onPressed: _isTakingPicture
+                      ? null
+                      : () async {
+                          try {
+                            setState(() {
+                              _isTakingPicture = true;
+                            });
+                            await _initializeControllerFuture;
+                            takePicture();
+                          } catch (e) {
+                            setState(() {
+                              _isTakingPicture = false;
+                            });
+                          }
+                        },
+                  child: _isTakingPicture
+                      ? const CircularProgressIndicator() // Show circular progress indicator while taking picture
+                      : const Icon(Icons.camera),
+                )
               ],
             )
           ],
