@@ -85,7 +85,7 @@ class _MapScreenState extends State<MapScreen> {
       Uri.parse('$baseUrl/commands?email=$email&password=$password'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'type': 'PLACES',
+        'type': 'FACILITIES',
         'data': {
           'radius': 1000000,
           'location': {'lat': 0, 'lng': 0}
@@ -101,31 +101,35 @@ class _MapScreenState extends State<MapScreen> {
         String name = item['data']['name'];
         String type = item['data']['bin_type'];
         BitmapDescriptor icon;
-        if (type.contains('זכוכית')) {
+        icon = await BitmapDescriptor.fromAssetImage(
+            const ImageConfiguration(size: Size(15, 15)),
+            'assets/icons/${type}_recycle_icon.png');
+        /*
+        if (type.contains('glass')) {
           icon = await BitmapDescriptor.fromAssetImage(
               const ImageConfiguration(size: Size(15, 15)),
               'assets/icons/glass_recycle_icon.png');
-        } else if (type.contains('קרטון')) {
+        } else if (type.contains('cardboard')) {
           icon = await BitmapDescriptor.fromAssetImage(
               const ImageConfiguration(size: Size(15, 15)),
               'assets/icons/cardboard_recycle_icon.png');
-        } else if (type.contains('אריזות')) {
+        } else if (type.contains('package')) {
           icon = await BitmapDescriptor.fromAssetImage(
               const ImageConfiguration(size: Size(15, 15)),
               'assets/icons/packages_recycle_icon.png');
-        } else if (type.contains('טקסטיל')) {
+        } else if (type.contains('textile')) {
           icon = await BitmapDescriptor.fromAssetImage(
               const ImageConfiguration(size: Size(15, 15)),
               'assets/icons/textile_recycle_icon.png');
-        } else if (type.contains('נייר')) {
+        } else if (type.contains('paper')) {
           icon = await BitmapDescriptor.fromAssetImage(
               const ImageConfiguration(size: Size(15, 15)),
               'assets/icons/paper_recycle_icon.png');
-        } else if (type.contains('אלקטרונית')) {
+        } else if (type.contains('electronic')) {
           icon = await BitmapDescriptor.fromAssetImage(
               const ImageConfiguration(size: Size(15, 15)),
               'assets/icons/electronic_recycle_icon.png');
-        } else if (type.contains('סוללות')) {
+        } else if (type.contains('batteries')) {
           icon = await BitmapDescriptor.fromAssetImage(
               const ImageConfiguration(size: Size(15, 15)),
               'assets/icons/batteries_recycle_icon.png');
@@ -134,7 +138,7 @@ class _MapScreenState extends State<MapScreen> {
         } else {
           icon =
               BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
-        }
+        }*/
         Marker location = Marker(
           markerId: MarkerId(name),
           position: LatLng(lat, lng),
