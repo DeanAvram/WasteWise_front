@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:map_app/pages/login_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:map_app/pages/map_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -24,7 +24,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late bool _isPasswordVisible;
   late bool _isFieldMissing;
   late String _errMsg;
-  
 
   @override
   void initState() {
@@ -39,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> registerUser() async {
     await dotenv.load(fileName: ".env");
     String? baseUrl = dotenv.env['BASE_URL'];
-    String url = '$baseUrl/users'; // Replace with your actual API endpoint
+    String url = '$baseUrl/users';
     Map<String, dynamic> data = {
       'name': nameController.text,
       'email': emailController.text,
@@ -54,15 +53,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
         body: jsonEncode(data),
       );
 
-      if (response.statusCode == 201){
+      if (response.statusCode == 201) {
         //user created
         //Map<String, dynamic> data = json.decode(response.body);
         setState(() {
-          _isSuccessfullyRegistered = false;
+          _isSuccessfullyRegistered = true;
+          _isErrorInData = false;
+          Navigator.pop(context);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MapScreen(
+                        name: data['name'],
+                        email: data['email'],
+                        password: data['password'],
+                        role: data['role'],
+                      )));
         });
-        
-      }
-      else if (response.statusCode == 400){
+      } else if (response.statusCode == 400) {
         //bad request
         Map<String, dynamic> err = json.decode(response.body);
         String msg = err['message'];
@@ -71,13 +79,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _errMsg = msg;
         });
       }
-      
     } catch (error) {
       print('Error during registration: $error');
     }
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -91,14 +96,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Name *')
-            ),
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name *')),
             const SizedBox(height: 10),
             TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email *')
-            ),
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email *')),
             const SizedBox(height: 10),
             TextField(
               controller: passwordController,
@@ -106,94 +109,91 @@ class _RegisterScreenState extends State<RegisterScreen> {
               decoration: InputDecoration(
                 labelText: 'Password *',
                 suffixIcon: IconButton(
-                    icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                        color: Theme.of(context).primaryColorDark, 
-                      ),
-                      onPressed: (){
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
+                  icon: Icon(
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: Theme.of(context).primaryColorDark,
                   ),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
                 ),
+              ),
             ),
             const SizedBox(height: 20),
             Column(
               children: [
                 ElevatedButton(
-                onPressed: () {
-                  if (nameController.text.isEmpty || emailController.text.isEmpty || passwordController.text.isEmpty){
-                    setState(() {
-                       _isFieldMissing = true;
-                      if (nameController.text.isEmpty){
-                        _errMsg = 'Name is missing';
-                      }
-                      else if (emailController.text.isEmpty){
-                        _errMsg = 'Email is missing';
-                      }
-                      else if (passwordController.text.isEmpty){
-                        _errMsg = 'Password is missing';
-                      }
-                    });
-                  }
-                  else{
-                    setState(() {
-                      _isFieldMissing = false;
-                    });
-                    registerUser();
-                  }
-                },
-                child: const Text('Register',
-                              style: TextStyle(
-                                      color: Colors.blue
-                                    )
-                          ),
-                        ),
-              const SizedBox(height: 16.0),
-              Visibility(
-                visible: _isSuccessfullyRegistered,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:[
-                  const Text(
-                    "Successfully registered. Go to",
-                    style: TextStyle(fontSize: 16)
-                  ),
-                  TextButton(
-                    onPressed: (){
-                      Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
-                    },
-                    child: const Text("Login", style: TextStyle(fontSize: 16.0))
-                    )
-                  ]
+                  onPressed: () {
+                    if (nameController.text.isEmpty ||
+                        emailController.text.isEmpty ||
+                        passwordController.text.isEmpty) {
+                      setState(() {
+                        _isFieldMissing = true;
+                        if (nameController.text.isEmpty) {
+                          _errMsg = 'Name is missing';
+                        } else if (emailController.text.isEmpty) {
+                          _errMsg = 'Email is missing';
+                        } else if (passwordController.text.isEmpty) {
+                          _errMsg = 'Password is missing';
+                        }
+                      });
+                    } else {
+                      setState(() {
+                        _isFieldMissing = false;
+                      });
+                      registerUser();
+                    }
+                  },
+                  child: const Text('Register',
+                      style: TextStyle(color: Colors.blue)),
                 ),
-              ),
-              Visibility(
-                //error message
-                visible: _isErrorInData || _isFieldMissing,
-                child: Text(
-                    _errMsg,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold
-                      )
-                  )
-              )
+                const SizedBox(height: 16.0),
+                Visibility(
+                  visible: _isSuccessfullyRegistered,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Successfully registered. Go to",
+                            style: TextStyle(fontSize: 16)),
+                        TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const LoginScreen()));
+                            },
+                            child: const Text("Login",
+                                style: TextStyle(fontSize: 16.0)))
+                      ]),
+                ),
+                Visibility(
+                    //error message
+                    visible: _isErrorInData || _isFieldMissing,
+                    child: Text(_errMsg,
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold)))
               ],
             ),
             Row(
               children: [
                 const Text('Alreday have an account? Go to'),
                 TextButton(
-                    onPressed: (){
+                    onPressed: () {
                       Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginScreen()));
                     },
-                    child: const Text("Login")
-                    )
+                    child: const Text("Login"))
               ],
             )
           ],
