@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:map_app/pages/classification_dialog_screen.dart';
+import 'package:map_app/screens/classification_dialog_screen.dart';
 
 class CameraScreen extends StatefulWidget {
   final String name, email, password, role;

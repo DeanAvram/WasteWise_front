@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:map_app/pages/account_screen.dart';
-import 'package:map_app/pages/login_screen.dart';
-import 'package:map_app/pages/recycle_history_screen.dart';
+import 'package:map_app/screens/account_screen.dart';
+import 'package:map_app/screens/login_screen.dart';
+import 'package:map_app/screens/recycle_history_screen.dart';
 
 class Tooblar extends StatelessWidget {
   final String name, email, password, role;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:map_app/pages/account_info_screen.dart';
+import 'package:map_app/screens/account_info_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   final String name, email, password, role;

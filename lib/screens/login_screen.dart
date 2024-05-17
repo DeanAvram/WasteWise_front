@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:map_app/pages/map_screen.dart';
-import 'package:map_app/pages/register_screen.dart';
+import 'package:map_app/screens/map_screen.dart';
+import 'package:map_app/screens/register_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -5,9 +5,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 //import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:map_app/pages/Tooblar.dart';
+import 'package:map_app/screens/Tooblar.dart';
 import 'package:camera/camera.dart';
-import 'package:map_app/pages/camera_screen.dart';
+import 'package:map_app/screens/camera_screen.dart';
 import 'package:http/http.dart' as http;
 
 class MapScreen extends StatefulWidget {

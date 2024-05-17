@@ -2,10 +2,10 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:map_app/pages/login_screen.dart';
+import 'package:map_app/screens/login_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:map_app/pages/map_screen.dart';
+import 'package:map_app/screens/map_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
