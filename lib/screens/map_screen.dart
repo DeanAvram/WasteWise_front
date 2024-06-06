@@ -9,6 +9,7 @@ import 'package:map_app/screens/Tooblar.dart';
 import 'package:camera/camera.dart';
 import 'package:map_app/screens/camera_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class MapScreen extends StatefulWidget {
   final String name, email, password, role;
@@ -271,8 +272,16 @@ class _MapScreenState extends State<MapScreen> {
 }
 
 void changeMapMode(GoogleMapController mapController) {
-  getJsonFile("assets/map_styles/day_map.json")
-      .then((value) => setMapStyle(value, mapController));
+  DateTime now = DateTime.now();
+  if (now.hour >= 5 && now.hour <= 18) {
+    //5 am to 19 pm
+    getJsonFile("assets/map_styles/day_map.json")
+        .then((value) => setMapStyle(value, mapController));
+  } else {
+    //19 pm to 5 am
+    getJsonFile("assets/map_styles/night_map.json")
+        .then((value) => setMapStyle(value, mapController));
+  }
 }
 
 void setMapStyle(String mapStyle, GoogleMapController mapController) {
