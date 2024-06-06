@@ -9,7 +9,8 @@ import 'package:map_app/screens/Tooblar.dart';
 import 'package:camera/camera.dart';
 import 'package:map_app/screens/camera_screen.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
+
+const int dayStart = 5, dayEnd = 18;
 
 class MapScreen extends StatefulWidget {
   final String name, email, password, role;
@@ -105,41 +106,7 @@ class _MapScreenState extends State<MapScreen> {
         icon = await BitmapDescriptor.fromAssetImage(
             const ImageConfiguration(size: Size(15, 15)),
             'assets/icons/${type}_recycle_icon.png');
-        /*
-        if (type.contains('glass')) {
-          icon = await BitmapDescriptor.fromAssetImage(
-              const ImageConfiguration(size: Size(15, 15)),
-              'assets/icons/glass_recycle_icon.png');
-        } else if (type.contains('cardboard')) {
-          icon = await BitmapDescriptor.fromAssetImage(
-              const ImageConfiguration(size: Size(15, 15)),
-              'assets/icons/cardboard_recycle_icon.png');
-        } else if (type.contains('package')) {
-          icon = await BitmapDescriptor.fromAssetImage(
-              const ImageConfiguration(size: Size(15, 15)),
-              'assets/icons/packages_recycle_icon.png');
-        } else if (type.contains('textile')) {
-          icon = await BitmapDescriptor.fromAssetImage(
-              const ImageConfiguration(size: Size(15, 15)),
-              'assets/icons/textile_recycle_icon.png');
-        } else if (type.contains('paper')) {
-          icon = await BitmapDescriptor.fromAssetImage(
-              const ImageConfiguration(size: Size(15, 15)),
-              'assets/icons/paper_recycle_icon.png');
-        } else if (type.contains('electronic')) {
-          icon = await BitmapDescriptor.fromAssetImage(
-              const ImageConfiguration(size: Size(15, 15)),
-              'assets/icons/electronic_recycle_icon.png');
-        } else if (type.contains('batteries')) {
-          icon = await BitmapDescriptor.fromAssetImage(
-              const ImageConfiguration(size: Size(15, 15)),
-              'assets/icons/batteries_recycle_icon.png');
-        } else if (type.contains('סולארי')) {
-          continue;
-        } else {
-          icon =
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
-        }*/
+
         Marker location = Marker(
           markerId: MarkerId(name),
           position: LatLng(lat, lng),
@@ -180,6 +147,13 @@ class _MapScreenState extends State<MapScreen> {
 
   void addCurrentUserLocationMarker(Position? p) async {
     //ByteData? bytes = await createIcon(Icons.my_location);
+    bool isDayTime =
+        DateTime.now().hour >= dayStart && DateTime.now().hour <= dayEnd;
+    BitmapDescriptor icon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(size: Size(48, 48)),
+        isDayTime
+            ? 'assets/icons/day_location.png'
+            : 'assets/icons/night_location.png');
     Marker userLocationMarker = Marker(
         markerId: const MarkerId("user_location"),
         position: LatLng(
@@ -187,13 +161,7 @@ class _MapScreenState extends State<MapScreen> {
           p.longitude,
         ),
         infoWindow: const InfoWindow(title: "Your Location"),
-        icon: await BitmapDescriptor.fromAssetImage(
-            const ImageConfiguration(size: Size(48, 48)),
-            'assets/icons/location.png')
-
-        //icon: BitmapDescriptor.fromBytes(
-        //   bytes!.buffer.asUint8List()) // Customize as needed
-        );
+        icon: icon);
     markers.add(userLocationMarker);
     // Add the user location marker to the list
   }
@@ -273,7 +241,7 @@ class _MapScreenState extends State<MapScreen> {
 
 void changeMapMode(GoogleMapController mapController) {
   DateTime now = DateTime.now();
-  if (now.hour >= 5 && now.hour <= 18) {
+  if (now.hour >= dayStart && now.hour <= dayEnd) {
     //5 am to 19 pm
     getJsonFile("assets/map_styles/day_map.json")
         .then((value) => setMapStyle(value, mapController));
