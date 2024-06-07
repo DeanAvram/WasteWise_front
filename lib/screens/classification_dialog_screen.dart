@@ -62,11 +62,11 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
 
   void _showOptionsBottomSheet() {
     List<String> options = [
-      'cardboard',
-      'glass',
-      'paper',
-      'package',
-      'textile'
+      'Cardboard',
+      'Glass',
+      'Paper',
+      'Package',
+      'Textile'
     ]; // Add your list of options here
 
     showModalBottomSheet(
@@ -96,7 +96,6 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
   }
 
   Future<void> directToRecycleBin(String classification) async {
-    print(classification);
     await dotenv.load(fileName: ".env");
     String? baseUrl = dotenv.env['BASE_URL'];
     Response response = await http.post(
@@ -113,7 +112,6 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
         }
       }),
     );
-    print(response.statusCode);
     if (response.statusCode == 201) {
       Map<String, dynamic> binData = json.decode(response.body);
       List<dynamic> binLoc = binData['data']['location']['coordinates'];
