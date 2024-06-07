@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-//import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_app/screens/Tooblar.dart';
@@ -102,11 +101,9 @@ class _MapScreenState extends State<MapScreen> {
         double lat = item['data']['location']['coordinates'][1];
         String name = item['data']['name'];
         String type = item['data']['bin_type'];
-        BitmapDescriptor icon;
-        icon = await BitmapDescriptor.fromAssetImage(
+        BitmapDescriptor icon = await BitmapDescriptor.fromAssetImage(
             const ImageConfiguration(size: Size(15, 15)),
             'assets/icons/${type}_recycle_icon.png');
-
         Marker location = Marker(
           markerId: MarkerId(name),
           position: LatLng(lat, lng),

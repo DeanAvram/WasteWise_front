@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:map_app/screens/account_screen.dart';
 import 'package:map_app/screens/login_screen.dart';
+import 'package:map_app/screens/private_facility_screen.dart';
 import 'package:map_app/screens/recycle_history_screen.dart';
 
 class Tooblar extends StatelessWidget {
@@ -82,7 +83,22 @@ class Tooblar extends StatelessWidget {
                           role: userRole)));
             },
           ),
-          // Add more items as needed
+          ListTile(
+            leading: const Icon(Icons.recycling, color: Colors.white),
+            title: const Text('Add Private Recycle Facility',
+                style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PrivateFacilityScreen(
+                          name: userName,
+                          email: userEmail,
+                          password: userPassword,
+                          role: userRole)));
+            },
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

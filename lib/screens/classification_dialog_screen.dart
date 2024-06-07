@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ClassificationScreen extends StatefulWidget {
   final String email, classification, password;
@@ -63,10 +64,9 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
     List<String> options = [
       'cardboard',
       'glass',
-      'metal',
       'paper',
-      'plastic',
-      'trash'
+      'package',
+      'textile'
     ]; // Add your list of options here
 
     showModalBottomSheet(
@@ -96,6 +96,7 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
   }
 
   Future<void> directToRecycleBin(String classification) async {
+    print(classification);
     await dotenv.load(fileName: ".env");
     String? baseUrl = dotenv.env['BASE_URL'];
     Response response = await http.post(
@@ -112,6 +113,28 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
         }
       }),
     );
-    print(response.body);
+    print(response.statusCode);
+    if (response.statusCode == 201) {
+      Map<String, dynamic> binData = json.decode(response.body);
+      List<dynamic> binLoc = binData['data']['location']['coordinates'];
+      _openGoogleMaps(binLoc[1], binLoc[0]);
+    } else {
+      //no bin of this type found
+    }
+  }
+}
+
+void _openGoogleMaps(double latitude, double longitude) async {
+  final String googleMapsUrl =
+      "comgooglemaps://?daddr=$latitude,$longitude&directionsmode=driving";
+  final String webGoogleMapsUrl =
+      "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude";
+
+  if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+    await launchUrl(Uri.parse(googleMapsUrl));
+  } else if (await canLaunchUrl(Uri.parse(webGoogleMapsUrl))) {
+    await launchUrl(Uri.parse(webGoogleMapsUrl));
+  } else {
+    throw 'Could not launch $googleMapsUrl';
   }
 }
