@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
-import 'package:geocoding/geocoding.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:map_app/screens/map_screen.dart';
 
 const int dayStart = 5, dayEnd = 18;
 
@@ -30,7 +32,8 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
 
   String? selectedBinType;
   List<String> binTypes = ['Cardboard', 'Glass', 'Paper', 'Package', 'Textile'];
-  Set<Marker> _markers = {}; // Define _markers here
+  final Set<Marker> _markers = {}; // Define _markers here
+  String _address = "";
 
   @override
   void initState() {
@@ -75,7 +78,6 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
   String get email => widget.email;
   String get password => widget.password;
   String get role => widget.role;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,18 +169,34 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
                             });
                             // Add a marker on the tapped position
                             _addMarker(position);
-                            // Print the tapped position to the console
-                            print(
-                                'Tapped position: ${position.latitude}, ${position.longitude}');
                           },
                           markers: _markers
                               .toSet(), // Set of markers to display on the map
                         ),
                 ),
                 const SizedBox(height: 15),
+
+                //Text(binStreet!,
+                //    style: const TextStyle(color: Colors.white, fontSize: 16)),
+                const SizedBox(height: 15),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Bin Address: ",
+                        style: TextStyle(color: Colors.white, fontSize: 16)),
+                    const SizedBox(
+                        width: 8), // Add some space between label and value
+                    Expanded(
+                      child: Text(_address,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 16)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle button press here
+                    saveBinToDB(_binType, _address);
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(
@@ -203,20 +221,24 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
     });
 
     // Perform reverse geocoding to get the address
-    /*
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-      print(placemarks);
-      if (placemarks.isNotEmpty) {
-        String address = placemarks[0].name ?? '';
-        print('Address: $address');
+    await dotenv.load(fileName: ".env");
+    String? googleUrl = dotenv.env['GOOGLE_MAPS_URL'];
+    String? apiKey = dotenv.env['API_KEY'];
+    String lat = position.latitude.toString();
+    String lng = position.longitude.toString();
+    final response = await http
+        .get(Uri.parse('$googleUrl/json?latlng=$lat,$lng&key=$apiKey'));
+    if (response.statusCode == 200) {
+      try {
+        String binName =
+            json.decode(response.body)['results'][0]['formatted_address'];
+        setState(() {
+          _address = binName;
+        });
+      } catch (e) {
+        throw Exception(e.toString());
       }
-    } catch (e) {
-      print('Error getting address: $e');
-    }*/
+    }
   }
 
   void changeMapMode(GoogleMapController mapController) {
@@ -240,5 +262,85 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
     ByteData byte = await rootBundle.load(path);
     var list = byte.buffer.asUint8List(byte.offsetInBytes, byte.lengthInBytes);
     return utf8.decode(list);
+  }
+
+  Future<void> saveBinToDB(String? binType, String address) async {
+    if (binType == null) {
+      _showFailureDialog("Bin type is missing");
+      return;
+    }
+    if (address.isEmpty) {
+      _showFailureDialog("Bin location is missing");
+    }
+    await dotenv.load(fileName: ".env");
+    String? baseUrl = dotenv.env['BASE_URL'];
+    final response = await http.post(
+        Uri.parse('$baseUrl/objects?email=$email&password=$password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'type': 'PRIVATE_FACILITY',
+          'data': {
+            'bin_type': binType.toLowerCase(),
+            'name': address,
+            'location': {
+              'coordinates': [
+                _markers.first.position.longitude,
+                _markers.first.position.latitude
+              ]
+            }
+          }
+        }));
+    if (response.statusCode == 201) {
+      _showSuccessDialog();
+    }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Success'),
+          content: const Text(
+              'The recycling facility has been created successfully.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MapScreen(
+                              name: name,
+                              email: email,
+                              password: password,
+                              role: role,
+                            )));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFailureDialog(String errorMsg) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Failure'),
+          content: Text(errorMsg),
+          actions: <Widget>[
+            TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
+          ],
+        );
+      },
+    );
   }
 }
