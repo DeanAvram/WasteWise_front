@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:map_app/screens/account_screen.dart';
 import 'package:map_app/screens/login_screen.dart';
+import 'package:map_app/screens/my_private_facilities_screen.dart';
 import 'package:map_app/screens/private_facility_screen.dart';
 import 'package:map_app/screens/recycle_history_screen.dart';
 
@@ -93,6 +94,23 @@ class Tooblar extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) => PrivateFacilityScreen(
+                          name: userName,
+                          email: userEmail,
+                          password: userPassword,
+                          role: userRole)));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.store_mall_directory_rounded,
+                color: Colors.white),
+            title: const Text('My Private Recycle Facilities',
+                style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MyPrivateFacilitiesScreen(
                           name: userName,
                           email: userEmail,
                           password: userPassword,
