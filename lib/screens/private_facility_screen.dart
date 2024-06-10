@@ -10,13 +10,15 @@ const int dayStart = 5, dayEnd = 18;
 
 class PrivateFacilityScreen extends StatefulWidget {
   final String name, email, password, role;
+  final Map<String, dynamic>? facilityData;
 
   const PrivateFacilityScreen(
       {super.key,
       required this.name,
       required this.email,
       required this.password,
-      required this.role});
+      required this.role,
+      this.facilityData});
 
   @override
   State<PrivateFacilityScreen> createState() => _PrivateFacilityState();
@@ -38,24 +40,61 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.facilityData != null) {
+      _initializeFields();
+    }
     initializeMap();
+  }
+
+  void _initializeFields() {
+    setState(() {
+      nameController.text = widget.facilityData!['data']['private_name'];
+      _binType =
+          widget.facilityData!['data']['bin_type'].toString()[0].toUpperCase() +
+              widget.facilityData!['data']['bin_type'].toString().substring(1);
+      //match the values list
+      _address = widget.facilityData!['data']['name'];
+      tappedPosition = LatLng(
+        widget.facilityData!['data']['location']['coordinates'][1],
+        widget.facilityData!['data']['location']['coordinates'][0],
+      );
+      _markers.add(
+        Marker(
+          markerId: MarkerId(tappedPosition.toString()),
+          position: tappedPosition!,
+        ),
+      );
+    });
   }
 
   Future<void> initializeMap() async {
     await getCurrentLocation();
-    if (mounted && currentPosition != null) {
+    if (mounted) {
       setState(() {
-        mapController?.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(
-                currentPosition!.latitude,
-                currentPosition!.longitude,
+        if (_markers.isNotEmpty) {
+          // Get the position of the first marker
+          LatLng markerPosition = _markers.first.position;
+          mapController?.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: markerPosition,
+                zoom: 17.0,
               ),
-              zoom: 17.0,
             ),
-          ),
-        );
+          );
+        } else if (currentPosition != null) {
+          mapController?.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: LatLng(
+                  currentPosition!.latitude,
+                  currentPosition!.longitude,
+                ),
+                zoom: 17.0,
+              ),
+            ),
+          );
+        }
       });
     }
   }
@@ -161,13 +200,18 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
                               });
                             }
                           },
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(
-                              currentPosition!.latitude,
-                              currentPosition!.longitude,
-                            ),
-                            zoom: 17.0,
-                          ),
+                          initialCameraPosition: _markers.isNotEmpty
+                              ? CameraPosition(
+                                  target: _markers.first.position,
+                                  zoom: 17.0,
+                                )
+                              : CameraPosition(
+                                  target: LatLng(
+                                    currentPosition!.latitude,
+                                    currentPosition!.longitude,
+                                  ),
+                                  zoom: 17.0,
+                                ),
                           onTap: (LatLng position) {
                             setState(() {
                               tappedPosition = position;
@@ -179,10 +223,6 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
                               .toSet(), // Set of markers to display on the map
                         ),
                 ),
-                const SizedBox(height: 15),
-
-                //Text(binStreet!,
-                //    style: const TextStyle(color: Colors.white, fontSize: 16)),
                 const SizedBox(height: 15),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,36 +320,63 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
     }
     await dotenv.load(fileName: ".env");
     String? baseUrl = dotenv.env['BASE_URL'];
-    final response = await http.post(
-        Uri.parse('$baseUrl/objects?email=$email&password=$password'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'type': 'PRIVATE_FACILITY',
-          'data': {
-            'bin_type': binType.toLowerCase(),
-            'name': address,
-            'private_name': privateName,
-            'location': {
-              'coordinates': [
-                _markers.first.position.longitude,
-                _markers.first.position.latitude
-              ]
+    if (widget.facilityData == null) {
+      //new recycle facility
+      final response = await http.post(
+          Uri.parse('$baseUrl/objects?email=$email&password=$password'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'type': 'PRIVATE_FACILITY',
+            'data': {
+              'bin_type': binType.toLowerCase(),
+              'name': address,
+              'private_name': privateName,
+              'location': {
+                'coordinates': [
+                  _markers.first.position.longitude,
+                  _markers.first.position.latitude
+                ]
+              }
             }
-          }
-        }));
-    if (response.statusCode == 201) {
-      _showSuccessDialog();
+          }));
+
+      if (response.statusCode == 201) {
+        _showSuccessDialog(
+            'The recycling facility has been created successfully.');
+      }
+    } else {
+      String objId = widget.facilityData!['_id'];
+      //edit facility
+      final response = await http.put(
+          Uri.parse('$baseUrl/objects/$objId?email=$email&password=$password'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'data': {
+              'bin_type': binType.toLowerCase(),
+              'name': address,
+              'private_name': privateName,
+              'location': {
+                'coordinates': [
+                  _markers.first.position.longitude,
+                  _markers.first.position.latitude
+                ]
+              }
+            }
+          }));
+      if (response.statusCode == 204) {
+        _showSuccessDialog(
+            'The recycling facility has been updated successfully.');
+      }
     }
   }
 
-  void _showSuccessDialog() {
+  void _showSuccessDialog(String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Success'),
-          content: const Text(
-              'The recycling facility has been created successfully.'),
+          content: Text(message),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),

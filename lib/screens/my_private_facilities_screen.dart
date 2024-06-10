@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:map_app/screens/private_facility_screen.dart';
 
 class MyPrivateFacilitiesScreen extends StatefulWidget {
   final String name, email, password, role;
@@ -135,7 +136,21 @@ class _MyPrivateFacilitiesScreenState extends State<MyPrivateFacilitiesScreen> {
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.edit, color: Colors.white),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PrivateFacilityScreen(
+                                  name: name,
+                                  email: email,
+                                  password: password,
+                                  role: role,
+                                  facilityData: _dataList[
+                                      index], // Pass the facility data
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       );
                     },
