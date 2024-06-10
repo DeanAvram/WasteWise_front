@@ -5,7 +5,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:map_app/screens/map_screen.dart';
 
 const int dayStart = 5, dayEnd = 18;
 
@@ -34,6 +33,7 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
   List<String> binTypes = ['Cardboard', 'Glass', 'Paper', 'Package', 'Textile'];
   final Set<Marker> _markers = {}; // Define _markers here
   String _address = "";
+  String _name = "";
 
   @override
   void initState() {
@@ -100,6 +100,11 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
               children: [
                 TextFormField(
                   controller: nameController,
+                  onChanged: (value) {
+                    setState(() {
+                      _name = value;
+                    });
+                  },
                   decoration: const InputDecoration(
                     labelText: 'Name',
                     labelStyle: TextStyle(
@@ -196,7 +201,7 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
                 const SizedBox(height: 15),
                 ElevatedButton(
                   onPressed: () {
-                    saveBinToDB(_binType, _address);
+                    saveBinToDB(_binType, _address, _name);
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(
@@ -264,7 +269,8 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
     return utf8.decode(list);
   }
 
-  Future<void> saveBinToDB(String? binType, String address) async {
+  Future<void> saveBinToDB(
+      String? binType, String address, String privateName) async {
     if (binType == null) {
       _showFailureDialog("Bin type is missing");
       return;
@@ -282,6 +288,7 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
           'data': {
             'bin_type': binType.toLowerCase(),
             'name': address,
+            'private_name': privateName,
             'location': {
               'coordinates': [
                 _markers.first.position.longitude,
@@ -307,16 +314,29 @@ class _PrivateFacilityState extends State<PrivateFacilityScreen> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
+                // Clear all fields
+                setState(() {
+                  nameController.clear();
+                  _binType = null;
+                  _address = "";
+                  _name = "";
+                  _markers.clear();
+                  tappedPosition = null;
+                  if (mapController != null && currentPosition != null) {
+                    mapController!.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(
+                          target: LatLng(
+                            currentPosition!.latitude,
+                            currentPosition!.longitude,
+                          ),
+                          zoom: 17.0,
+                        ),
+                      ),
+                    );
+                  }
+                });
                 Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MapScreen(
-                              name: name,
-                              email: email,
-                              password: password,
-                              role: role,
-                            )));
               },
             ),
           ],
