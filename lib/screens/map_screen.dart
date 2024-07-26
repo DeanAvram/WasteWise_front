@@ -34,7 +34,6 @@ class _MapScreenState extends State<MapScreen> {
   String get role => widget.role;
 
   List<Marker> markers = [];
-  bool _markerLoaded = false;
 
   @override
   void initState() {
@@ -112,35 +111,8 @@ class _MapScreenState extends State<MapScreen> {
         );
         markers.add(location);
       }
-      if (markers.length > 1) {
-        setState(() {
-          _markerLoaded = true;
-        });
-      }
     }
-    //print(response.body);
   }
-  /*Future<ByteData?> createIcon(IconData icon) async {
-    final pictureRecorder = PictureRecorder();
-    final canvas = Canvas(pictureRecorder);
-
-    final textPainter = TextPainter(textDirection: TextDirection.ltr);
-
-    final iconStr = String.fromCharCode(icon.codePoint);
-
-    textPainter.text = TextSpan(
-        text: iconStr,
-        style: TextStyle(
-            letterSpacing: 0.0, fontSize: 40.0, fontFamily: icon.fontFamily));
-    textPainter.layout();
-    textPainter.paint(canvas, const Offset(0.0, 0.0));
-
-    final picture = pictureRecorder.endRecording();
-    final image = await picture.toImage(48, 48);
-    final bytes = await image.toByteData(format: ImageByteFormat.png);
-
-    return bytes;
-  }*/
 
   void addCurrentUserLocationMarker(Position? p) async {
     //ByteData? bytes = await createIcon(Icons.my_location);
